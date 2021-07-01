@@ -2,6 +2,8 @@ using static System.Console;
 
 using System;
 using System.Collections;
+using static PolynomOperator;
+
 
 public class Program {
     //NTRU 503
@@ -12,8 +14,8 @@ public class Program {
     const int p = 3;
 
     /*
-    todo 1) Операции с многочленами ПО МОДУЛЮ
-    todo 2) Нахождение обратного полинома, алгоритм Евклида ПО МОДУЛЮ, ВСЕ ОПЕРАЦИИ ПО МОДУЛЮ N
+    todo 1) Операции с многочленами В ПОЛЕ Q
+    todo 2) GCD и обратный полином
     todo 3) Реализация алгоритма, собственно
 
      */
@@ -28,34 +30,48 @@ public class Program {
         "");
         //2+x+x^2+2x^4+x^6+x^9+2x^10
         //x^11 + 2
-         int[] factorBase3 = new int[]{2,0,0,0,0,0,0,0,0,0,0,1};
-         int [] polynom3 = new int[]{2,1,1,0,2,0,1,0,0,1,2};
-
-        int[] factorBase32 = new int[]{31,0,0,0,0,0,0,0,0,0,0,1};
-        int[] polynom32 = new int[]{31,1,1,0,31,0,1,0,0,1,31};
+        fraction[] factorBase = new fraction[]{-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
+        fraction [] f = new fraction[]{-1, 1, 1, 0, -1, 0, 1, 0, 0, 1, -1};
+        fraction [] g = new fraction[]{-1, 0, 1, 1, 0, 1, 0, 0, -1, 0, -1};
 
 
+        // -1 + X3 - X4 - X8 + X9 + X10
+        int[] m = new int[]{-1,0,0,1,-1,0,0,0,-1,1,1};
+
+        //-1 + X2 + X3 + X4 - X5 - X7.
+        int[] r = new int[]{-1,0,1,1,1,-1,0,-1};
+
+        NTRU oper = new NTRU(N, q, p);
+        oper.setPublicKey(f, g);
+
+        WriteLine(polynomToString(m));
 
 
-        Operator NTRUOperator = new Operator(32);
-        int[] c = NTRUOperator.polynomGetInverse(polynom32, factorBase32);
-        WriteLine(PolynomToString(c));
+        int[] a = oper.encrypt(m, r);
 
+        WriteLine(polynomToString(a));
+
+        int[] b = oper.decrypt(a);
+
+        WriteLine(polynomToString(b));
+
+
+
+
+
+        /*      fraction[][] result = EEAlgorithm.EGCD(factorBase, f);
+              g = result[0];
+              u = result[1];
+              v = result[2];
+
+              int[] v3 = PolynomOperator.toModulo(v,3);
+              int[] v32 = PolynomOperator.toModulo(v,32);
+
+              WriteLine(polynomToString(v3));
+              WriteLine(polynomToString(v32));*/
 
 
     }
 
-    public static string PolynomToString(int[] p){
-        string output = "";
-        for(int i = 0; i < p.Length; i++){
-           if(p[i]==0) continue;
-            string quotient = (p[i] == 1 && i!=0? "": ""+ p[i]);
-            string variable = (i == 0 ? "":"x");
-            string power = (i == 0 || i == 1 ? "":"^"+i);
-            string plus = (i == Operator.PolynomOperator.deg(p) ? "":"+");
-            output += quotient+variable+power+" " + plus + " ";
-       }
 
-        return output;
-    }
 }
