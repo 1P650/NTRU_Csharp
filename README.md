@@ -1,2 +1,1 @@
-qe
-
+Very raw implementation of NTRUEncrypt
